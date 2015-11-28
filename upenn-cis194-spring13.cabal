@@ -1,0 +1,19 @@
+name:                upenn-cis194-spring13
+version:             0.1.0.0
+synopsis:            UPenn CIS 194 Spring 13 homework solutions
+description:         Please see README.md
+homepage:            http://github.com/kemskems/upenn-cis194-spring13#readme
+license:             BSD3
+license-file:        LICENSE
+author:              Kemal Maulana
+maintainer:          kemal.maulana@fastmail.com
+copyright:           2015 Kemal Maulana
+category:            Education
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable upenn-cis194-spring13
+  hs-source-dirs:      src
+  main-is:             Main.hs
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5
