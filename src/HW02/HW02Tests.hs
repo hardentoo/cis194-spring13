@@ -1,7 +1,3 @@
--- CIS 194, Spring 2013
---
--- Test cases for HW 02
-
 {-# OPTIONS_GHC -Wall #-}
 
 module HW02.HW02Tests where
