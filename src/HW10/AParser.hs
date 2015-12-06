@@ -108,9 +108,9 @@ intOrUppercase = parseInt <|> parseUppercase
   where
     parseInt = Parser $ \s ->
         case runParser posInt s of
-            Nothing     -> Nothing
+            Nothing      -> Nothing
             Just (_, s') -> Just ((), s')
     parseUppercase = Parser $ \s ->
         case runParser (satisfy isUpper) s of
-            Nothing     -> Nothing
+            Nothing      -> Nothing
             Just (_, s') -> Just ((), s')
