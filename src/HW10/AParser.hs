@@ -2,7 +2,7 @@
    due Monday, 1 April
 -}
 
-module AParser where
+module HW10.AParser where
 
 import           Control.Applicative
 
@@ -61,23 +61,19 @@ posInt = Parser f
 -- Exercise 1 -----------------------------------------
 
 instance Functor Parser where
-    f `fmap` (Parser p) = Parser p'
-      where
-        p' s = case p s of
-                   Nothing     -> Nothing
-                   Just (a, c) -> Just (f a, c)
+    f `fmap` (Parser p) = Parser $ \s ->
+        case p s of
+            Nothing     -> Nothing
+            Just (a, c) -> Just (f a, c)
 
 -- Exercise 2 -----------------------------------------
 
 instance Applicative Parser where
-    pure a = Parser $ \_ -> Just (a, "")
-    (Parser pA) <*> (Parser pB) = Parser pC
-      where
-        pC s = case pA s of
-                   Nothing     -> Nothing
-                   Just (f, r) -> case pB r of
-                                      Nothing      -> Nothing
-                                      Just (b, r') -> Just (f b, r')
+    pure a = Parser $ \s -> Just (a, s)
+    (Parser pA) <*> pB = Parser $ \s ->
+        case pA s of
+            Nothing      -> Nothing
+            Just (f, s') -> runParser (f <$> pB) s'
 
 -- Exercise 3 -----------------------------------------
 
@@ -85,36 +81,36 @@ abParser :: Parser (Char, Char)
 abParser = (,) <$> char 'a' <*> char 'b'
 
 abParser_ :: Parser ()
-abParser_ = Parser p
-  where
-    p s = case runParser abParser s of
-              Nothing     -> Nothing
-              Just (_, r) -> Just ((), r)
+abParser_ = Parser $ \s ->
+    case runParser abParser s of
+        Nothing     -> Nothing
+        Just (_, r) -> Just ((), r)
 
 intPair :: Parser [Integer]
 intPair = makePair <$> posInt <*> nextPosInt
   where
     makePair x y = [x, y]
-    nextPosInt = Parser $ \s -> if null s || head s /= ' '
-                                then Nothing
-                                else runParser posInt $ tail s
+    nextPosInt = Parser $ \s ->
+        if null s || head s /= ' '
+        then Nothing
+        else runParser posInt $ tail s
 
 -- Exercise 4 -----------------------------------------
 
 instance Alternative Parser where
     empty = Parser $ const Nothing
-    (Parser pA) <|> (Parser pB) = Parser pC
-      where
-        pC s = pA s <|> pB s
+    (Parser pA) <|> (Parser pB) = Parser $ \s -> pA s <|> pB s
 
 -- Exercise 5 -----------------------------------------
 
 intOrUppercase :: Parser ()
 intOrUppercase = parseInt <|> parseUppercase
   where
-    parseInt = Parser $ \s -> case runParser posInt s of
-                                  Nothing     -> Nothing
-                                  Just (_, r) -> Just ((), r)
-    parseUppercase = Parser $ \s -> case runParser (satisfy isUpper) s of
-                                        Nothing     -> Nothing
-                                        Just (_, r) -> Just ((), r)
+    parseInt = Parser $ \s ->
+        case runParser posInt s of
+            Nothing     -> Nothing
+            Just (_, s') -> Just ((), s')
+    parseUppercase = Parser $ \s ->
+        case runParser (satisfy isUpper) s of
+            Nothing     -> Nothing
+            Just (_, s') -> Just ((), s')
